@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { IconXCircle, IconCheckCircle, IconBanknote, IconTarget } from "./Icons";
 import { ReactNode } from "react";
@@ -23,10 +24,22 @@ const item = {
 
 export default function ForDrivers() {
   return (
-    <section className="py-24 sm:py-32 bg-gradient-to-b from-amber-50/40 to-chalo-bg relative overflow-hidden">
+    <section className="relative py-24 sm:py-32 overflow-hidden">
+      {/* Background image — student waiting, warm tones */}
+      <div className="absolute inset-0">
+        <Image
+          src="/images/student-waiting.png"
+          alt=""
+          fill
+          className="object-cover"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-50/[0.93] to-white/[0.95]" />
+      </div>
+
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-200/60 to-transparent" />
 
-      <div className="max-w-5xl mx-auto px-6">
+      <div className="relative z-10 max-w-5xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -56,10 +69,10 @@ export default function ForDrivers() {
             <motion.div
               key={b.title}
               variants={item}
-              className="flex gap-5 p-6 sm:p-7 rounded-2xl bg-white border border-amber-100/80
-                         hover:border-amber-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+              className="flex gap-5 p-6 sm:p-7 rounded-2xl bg-white/80 backdrop-blur-sm border border-amber-100/80
+                         hover:bg-white hover:border-amber-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
             >
-              <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
                 {b.icon}
               </div>
               <div>

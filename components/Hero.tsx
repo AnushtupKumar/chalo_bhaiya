@@ -1,51 +1,22 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-chalo-bg">
-      {/* Decorative background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-chalo-green/10 to-emerald-100/20 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-amber-100/30 to-yellow-50/20 blur-3xl" />
-
-        {/* Subtle road lines */}
-        <svg
-          className="absolute bottom-0 left-0 right-0 w-full opacity-[0.04]"
-          viewBox="0 0 1200 200"
-          fill="none"
-        >
-          <path
-            d="M0 150 Q300 80 600 150 T1200 150"
-            stroke="currentColor"
-            strokeWidth="3"
-            className="text-chalo-navy"
-          />
-          <path
-            d="M0 170 Q300 100 600 170 T1200 170"
-            stroke="currentColor"
-            strokeWidth="2"
-            className="text-chalo-navy"
-            strokeDasharray="20 15"
-          />
-        </svg>
-
-        {/* Auto silhouette */}
-        <motion.div
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 0.06 }}
-          transition={{ duration: 1.5, delay: 0.8 }}
-          className="absolute bottom-20 right-[10%] text-chalo-navy"
-        >
-          <svg width="200" height="120" viewBox="0 0 200 120" fill="currentColor">
-            <rect x="30" y="40" width="140" height="50" rx="20" />
-            <rect x="10" y="60" width="180" height="30" rx="10" />
-            <circle cx="55" cy="95" r="15" />
-            <circle cx="145" cy="95" r="15" />
-            <rect x="60" y="30" width="80" height="35" rx="15" />
-          </svg>
-        </motion.div>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background — IIT Patna campus gate */}
+      <div className="absolute inset-0">
+        <Image
+          src="/images/iit-patna-gate.png"
+          alt=""
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/75 to-white" />
       </div>
 
       {/* Main content */}
@@ -55,7 +26,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
         >
-          <span className="inline-block px-4 py-1.5 mb-6 rounded-full text-sm font-medium bg-chalo-green/10 text-chalo-dark border border-chalo-green/20">
+          <span className="inline-block px-4 py-1.5 mb-6 rounded-full text-sm font-medium bg-white/80 text-chalo-dark border border-chalo-green/20 backdrop-blur-sm">
             Campus rides, reimagined
           </span>
         </motion.div>
@@ -99,12 +70,21 @@ export default function Hero() {
           </a>
           <a
             href="#story"
-            className="px-8 py-3.5 rounded-full border border-gray-200 text-chalo-slate font-medium text-base
-                       hover:border-gray-300 hover:bg-white transition-all duration-200"
+            className="px-8 py-3.5 rounded-full border border-gray-300 text-chalo-slate font-medium text-base
+                       bg-white/60 backdrop-blur-sm hover:bg-white hover:border-gray-400 transition-all duration-200"
           >
             See How It Works
           </a>
         </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.7 }}
+          className="mt-6 text-xs text-chalo-slate/40"
+        >
+          Starting at IIT Patna, Bihta
+        </motion.p>
       </div>
 
       {/* Scroll indicator */}
@@ -112,14 +92,14 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
       >
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="w-6 h-10 rounded-full border-2 border-gray-300 flex items-start justify-center p-1.5"
+          className="w-6 h-10 rounded-full border-2 border-gray-400/50 flex items-start justify-center p-1.5"
         >
-          <div className="w-1.5 h-2.5 rounded-full bg-gray-400" />
+          <div className="w-1.5 h-2.5 rounded-full bg-gray-500/60" />
         </motion.div>
       </motion.div>
     </section>

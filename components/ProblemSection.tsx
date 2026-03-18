@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { IconMapOff, IconPhoneCall, IconAlertTriangle, IconRouteOff } from "./Icons";
 
@@ -8,33 +9,25 @@ const problems = [
     icon: <IconMapOff className="w-5 h-5" />,
     title: "No ride-hailing coverage near campuses",
     description: "Ola and Uber don't operate in most tier-2 and tier-3 college areas. Students are left with no structured option.",
-    color: "from-red-50/80 to-white",
-    border: "border-red-100/80 hover:border-red-200",
-    iconColor: "text-red-500 bg-red-50",
+    iconColor: "text-red-500 bg-red-50 border-red-100",
   },
   {
     icon: <IconPhoneCall className="w-5 h-5" />,
     title: "Calling 3–4 drivers for one ride",
     description: "Without a system, students resort to calling multiple drivers manually, wasting time and creating confusion.",
-    color: "from-orange-50/80 to-white",
-    border: "border-orange-100/80 hover:border-orange-200",
-    iconColor: "text-orange-500 bg-orange-50",
+    iconColor: "text-orange-500 bg-orange-50 border-orange-100",
   },
   {
     icon: <IconAlertTriangle className="w-5 h-5" />,
     title: "Unreliable pickups, constant uncertainty",
     description: "No confirmations, no ETAs. Students wait without knowing if a driver is actually coming.",
-    color: "from-yellow-50/80 to-white",
-    border: "border-yellow-100/80 hover:border-yellow-200",
-    iconColor: "text-yellow-600 bg-yellow-50",
+    iconColor: "text-yellow-600 bg-yellow-50 border-yellow-100",
   },
   {
     icon: <IconRouteOff className="w-5 h-5" />,
     title: "Drivers lose time on cancelled trips",
     description: "Drivers arrive at pickup points only to find the student already left with another auto.",
-    color: "from-rose-50/80 to-white",
-    border: "border-rose-100/80 hover:border-rose-200",
-    iconColor: "text-rose-500 bg-rose-50",
+    iconColor: "text-rose-500 bg-rose-50 border-rose-100",
   },
 ];
 
@@ -50,10 +43,22 @@ const item = {
 
 export default function ProblemSection() {
   return (
-    <section className="py-24 sm:py-32 bg-white relative overflow-hidden">
+    <section className="relative py-24 sm:py-32 overflow-hidden">
+      {/* Background image — auto stand, faded */}
+      <div className="absolute inset-0">
+        <Image
+          src="/images/auto-stand.png"
+          alt=""
+          fill
+          className="object-cover"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-white/[0.92]" />
+      </div>
+
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
-      <div className="max-w-5xl mx-auto px-6">
+      <div className="relative z-10 max-w-5xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -83,10 +88,10 @@ export default function ProblemSection() {
             <motion.div
               key={p.title}
               variants={item}
-              className={`group p-6 sm:p-7 rounded-2xl bg-gradient-to-br ${p.color} border ${p.border}
-                         hover:shadow-xl hover:shadow-gray-100/60 hover:-translate-y-1 transition-all duration-300`}
+              className="group p-6 sm:p-7 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-100
+                         hover:bg-white hover:shadow-xl hover:shadow-gray-100/60 hover:-translate-y-1 transition-all duration-300"
             >
-              <div className={`w-10 h-10 rounded-lg ${p.iconColor} flex items-center justify-center mb-4`}>
+              <div className={`w-10 h-10 rounded-lg border ${p.iconColor} flex items-center justify-center mb-4`}>
                 {p.icon}
               </div>
               <h3 className="text-base font-bold text-chalo-navy mb-2">
