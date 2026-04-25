@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import RefundButton from "./RefundButton";
 
 export const dynamic = "force-dynamic";
 
@@ -207,6 +208,33 @@ export default async function RideDetailsPage({ params }: { params: { id: string
                   <div className="pt-2 border-t border-gray-800">
                     <p className="text-[10px] text-gray-500 uppercase mb-1">Transaction ID</p>
                     <p className="text-xs text-gray-400 font-mono break-all">{ride.payment.transaction_id}</p>
+                  </div>
+                )}
+                
+                {ride.status === 'CANCELLED' && 
+                 ride.payment.payment_status === 'SUCCESS' && 
+                 ride.payment.refund_status === 'NONE' && (
+                  <div className="mt-4 pt-4 border-t border-gray-800 space-y-3">
+                    <div className={`p-3 rounded-lg text-xs flex items-start gap-2 ${ride.cancel_reason?.toLowerCase().includes('student') ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                      <div>
+                        <p className="font-bold uppercase tracking-tight">Recommendation</p>
+                        <p className="opacity-80">
+                          {ride.cancel_reason?.toLowerCase().includes('student') 
+                            ? "Student cancelled. You can keep the advance fee as a penalty." 
+                            : "Driver or system cancelled. Refunding the student is recommended."}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-2">
+                      <RefundButton paymentId={ride.payment.id} />
+                      {ride.cancel_reason?.toLowerCase().includes('student') && (
+                        <p className="text-[10px] text-gray-600 text-center italic">
+                          If you choose not to refund, the advance will be recorded as revenue.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

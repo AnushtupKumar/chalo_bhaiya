@@ -17,13 +17,19 @@ export default function NewDriverForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const vehicleRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/;
+    const cleanVehicle = formData.vehicle_number.trim().toUpperCase().replace(/\s/g, "");
+
     if (!formData.phone) return setError("Phone number is required");
     if (!formData.vehicle_number) return setError("Vehicle number is required");
+    if (!vehicleRegex.test(cleanVehicle)) {
+      return setError("Invalid Vehicle Number format. Use standard Indian format (e.g. MH01AB1234)");
+    }
     
     setIsPending(true);
     setError(null);
 
-    const result = await createDriver(formData);
+    const result = await createDriver({ ...formData, vehicle_number: cleanVehicle });
     
     if (result.error) {
       setError(result.error);

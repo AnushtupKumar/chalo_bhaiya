@@ -112,15 +112,18 @@ export async function processPayout(driverId: string, earningIds: string[], amou
 }
 
 export async function createDriver(data: any) {
-  if (!data.vehicle_number?.trim()) {
-    return { error: "Vehicle number is required." };
+  const vehicleRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/;
+  const cleanVehicle = data.vehicle_number?.trim().toUpperCase().replace(/\s/g, "");
+
+  if (!cleanVehicle || !vehicleRegex.test(cleanVehicle)) {
+    return { error: "Invalid Vehicle Number format." };
   }
   try {
     const driver = await prisma.driver.create({
       data: {
         phone: data.phone.trim(),
         name: data.name.trim(),
-        vehicle_number: data.vehicle_number?.trim().toUpperCase(),
+        vehicle_number: cleanVehicle,
         onboarding_status: "SUBMITTED",
         kyc: {
           create: {
@@ -336,4 +339,39 @@ export async function updateSetting(key: string, value: string) {
 
   revalidatePath("/admin/settings");
   revalidatePath("/admin/revenue"); // Revenue page might show this
+}
+
+export async function processRefund(paymentId: string) {
+  const payment = await prisma.payment.findUnique({
+    where: { id: paymentId },
+    include: { ride: true }
+  });
+
+  if (!payment) throw new Error("Payment not found");
+
+  // In a real app, you would call Razorpay/PhonePe API here
+  // const refund = await razorpay.refunds.create({ payment_id: payment.transaction_id });
+
+  await prisma.payment.update({
+    where: { id: paymentId },
+    data: {
+      refund_status: "SUCCESS",
+      payment_status: "REFUNDED"
+    }
+  });
+
+  await logAction({
+    actor_type: "ADMIN",
+    action: "PROCESS_REFUND",
+    entity_type: "PAYMENT",
+    entity_id: paymentId,
+    metadata: { 
+      ride_id: payment.ride_id, 
+      amount: payment.amount,
+      reason: payment.ride.cancel_reason 
+    }
+  });
+
+  revalidatePath(`/admin/rides/${payment.ride_id}`);
+  revalidatePath("/admin/revenue");
 }
