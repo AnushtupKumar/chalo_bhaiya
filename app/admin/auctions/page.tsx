@@ -27,13 +27,17 @@ export default async function AuctionsPage() {
       }
     });
 
-    // CRITICAL: Serialize Decimal fields before passing to Client Component
+    // CRITICAL: Serialize all Decimal fields (including nested ones) before passing to Client Component
     activeAuctions = auctions.map(ride => ({
       ...ride,
       price: ride.price ? ride.price.toNumber() : null,
       bids: ride.bids.map(bid => ({
         ...bid,
-        bid_price: bid.bid_price.toNumber()
+        bid_price: bid.bid_price.toNumber(),
+        driver: {
+          ...bid.driver,
+          rating: bid.driver.rating ? bid.driver.rating.toNumber() : null
+        }
       }))
     }));
   } catch (e) {

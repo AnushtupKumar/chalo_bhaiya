@@ -21,7 +21,7 @@ export default async function RevenuePage() {
       }
     });
 
-    recentEarnings = await prisma.driverRideEarning.findMany({
+    const earningsList = await prisma.driverRideEarning.findMany({
       orderBy: { created_at: 'desc' },
       take: 20,
       include: {
@@ -33,6 +33,22 @@ export default async function RevenuePage() {
         }
       }
     });
+
+    // CRITICAL: Serialize Decimal fields before passing to Client Component logic
+    recentEarnings = earningsList.map(item => ({
+      ...item,
+      gross_amount: item.gross_amount.toNumber(),
+      platform_fee: item.platform_fee.toNumber(),
+      net_amount: item.net_amount.toNumber(),
+      ride: {
+        ...item.ride,
+        price: item.ride.price ? item.ride.price.toNumber() : null,
+        driver: item.ride.driver ? {
+          ...item.ride.driver,
+          rating: item.ride.driver.rating ? item.ride.driver.rating.toNumber() : null
+        } : null
+      }
+    }));
 
     const settings = await prisma.systemSetting.findUnique({
       where: { key: "PLATFORM_FEE_PERCENTAGE" }
