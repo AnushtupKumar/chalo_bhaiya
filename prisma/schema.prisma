@@ -110,7 +110,7 @@ model Driver {
   id                      String                 @id @default(uuid())
   name                    String?
   phone                   String                 @unique @db.VarChar(20)
-  vehicle_number          String?                @unique @db.VarChar(20)
+  vehicle_number          String                 @unique @db.VarChar(20)
   rating                  Decimal                @default(5.0) @db.Decimal(2, 1)
   status                  driver_status_enum     @default(INACTIVE)
   

@@ -112,21 +112,38 @@ export async function processPayout(driverId: string, earningIds: string[], amou
 }
 
 export async function createDriver(data: any) {
-  const driver = await prisma.driver.create({
-    data: {
-      phone: data.phone,
-      name: data.name,
-      vehicle_number: data.vehicle_number,
-      onboarding_status: "SUBMITTED",
-      kyc: {
-        create: {
-          kyc_status: "PENDING"
+  if (!data.vehicle_number?.trim()) {
+    return { error: "Vehicle number is required." };
+  }
+  try {
+    const driver = await prisma.driver.create({
+      data: {
+        phone: data.phone.trim(),
+        name: data.name.trim(),
+        vehicle_number: data.vehicle_number?.trim().toUpperCase(),
+        onboarding_status: "SUBMITTED",
+        kyc: {
+          create: {
+            kyc_status: "PENDING"
+          }
         }
       }
+    });
+    revalidatePath("/admin/drivers");
+    return { success: true, id: driver.id };
+  } catch (error: any) {
+    if (error.code === 'P2002') {
+      const target = error.meta?.target as string[];
+      if (target.includes('vehicle_number')) {
+        return { error: "A driver with this vehicle number is already registered." };
+      }
+      if (target.includes('phone')) {
+        return { error: "A driver with this phone number is already registered." };
+      }
     }
-  });
-  revalidatePath("/admin/drivers");
-  return driver.id;
+    console.error("Driver creation failed:", error);
+    return { error: "Failed to create driver. Please try again." };
+  }
 }
 
 export async function updateDriver(driverId: string, data: any) {
