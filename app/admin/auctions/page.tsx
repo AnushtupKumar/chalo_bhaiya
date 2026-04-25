@@ -7,7 +7,7 @@ export default async function AuctionsPage() {
   let activeAuctions: any[] = [];
   
   try {
-    activeAuctions = await prisma.ride.findMany({
+    const auctions = await prisma.ride.findMany({
       where: {
         status: "BIDDING",
       },
@@ -26,6 +26,16 @@ export default async function AuctionsPage() {
         created_at: 'desc'
       }
     });
+
+    // CRITICAL: Serialize Decimal fields before passing to Client Component
+    activeAuctions = auctions.map(ride => ({
+      ...ride,
+      price: ride.price ? ride.price.toNumber() : null,
+      bids: ride.bids.map(bid => ({
+        ...bid,
+        bid_price: bid.bid_price.toNumber()
+      }))
+    }));
   } catch (e) {
     console.error("Auction fetch failed (likely build-time):", e);
   }
