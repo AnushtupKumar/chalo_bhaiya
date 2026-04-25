@@ -4,10 +4,15 @@ import { Suspense } from "react";
 export const dynamic = "force-dynamic";
 
 export default async function AuditPage() {
-  const logs = await prisma.auditLog.findMany({
-    orderBy: { created_at: "desc" },
-    take: 100,
-  });
+  let logs: any[] = [];
+  try {
+    logs = await prisma.auditLog.findMany({
+      orderBy: { created_at: "desc" },
+      take: 100,
+    });
+  } catch (e) {
+    console.error("Audit fetch failed (likely build-time):", e);
+  }
 
   return (
     <div className="space-y-6">
@@ -30,8 +35,8 @@ export default async function AuditPage() {
           <tbody className="divide-y divide-gray-800">
             {logs.map((log) => (
               <tr key={log.id} className="hover:bg-[#222]/50 transition-colors">
-                <td className="px-6 py-4 text-xs font-mono text-gray-500">
-                  {new Date(log.created_at).toLocaleString()}
+                <td className="px-6 py-4 text-xs font-mono text-gray-500" suppressHydrationWarning>
+                  {new Date(log.created_at).toISOString().split('T')[0]} {new Date(log.created_at).getHours().toString().padStart(2, '0')}:{new Date(log.created_at).getMinutes().toString().padStart(2, '0')}
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex flex-col">

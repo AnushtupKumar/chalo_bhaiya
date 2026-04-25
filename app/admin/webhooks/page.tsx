@@ -5,10 +5,15 @@ import WebhookClientTable from "./WebhookClientTable";
 export const dynamic = "force-dynamic";
 
 export default async function WebhooksPage() {
-  const events = await prisma.webhookEvent.findMany({
-    orderBy: { created_at: "desc" },
-    take: 50,
-  });
+  let events: any[] = [];
+  try {
+    events = await prisma.webhookEvent.findMany({
+      orderBy: { created_at: "desc" },
+      take: 50,
+    });
+  } catch (e) {
+    console.error("Webhook fetch failed (likely build-time):", e);
+  }
 
   return (
     <div className="space-y-6">

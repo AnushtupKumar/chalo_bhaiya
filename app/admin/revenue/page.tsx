@@ -4,39 +4,47 @@ import { Suspense } from "react";
 export const dynamic = "force-dynamic";
 
 export default async function RevenuePage() {
-  // Aggregate stats
-  const stats = await prisma.driverRideEarning.aggregate({
-    _sum: {
-      gross_amount: true,
-      platform_fee: true,
-      net_amount: true,
-    },
-    _count: {
-      id: true
-    }
-  });
+  let stats: any = { _sum: { gross_amount: 0, platform_fee: 0, net_amount: 0 } };
+  let recentEarnings: any[] = [];
+  let currentFee = "10";
 
-  const recentEarnings = await prisma.driverRideEarning.findMany({
-    orderBy: { created_at: 'desc' },
-    take: 20,
-    include: {
-      ride: {
-        include: {
-          student: true,
-          driver: true
+  try {
+    // Aggregate stats
+    stats = await prisma.driverRideEarning.aggregate({
+      _sum: {
+        gross_amount: true,
+        platform_fee: true,
+        net_amount: true,
+      },
+      _count: {
+        id: true
+      }
+    });
+
+    recentEarnings = await prisma.driverRideEarning.findMany({
+      orderBy: { created_at: 'desc' },
+      take: 20,
+      include: {
+        ride: {
+          include: {
+            student: true,
+            driver: true
+          }
         }
       }
-    }
-  });
+    });
 
-  const settings = await prisma.systemSetting.findUnique({
-    where: { key: "PLATFORM_FEE_PERCENTAGE" }
-  });
-  const currentFee = settings?.value || "10";
+    const settings = await prisma.systemSetting.findUnique({
+      where: { key: "PLATFORM_FEE_PERCENTAGE" }
+    });
+    if (settings) currentFee = settings.value;
+  } catch (e) {
+    console.error("Revenue fetch failed (likely build-time):", e);
+  }
 
-  const totalGross = stats._sum.gross_amount?.toNumber() || 0;
-  const totalFees = stats._sum.platform_fee?.toNumber() || 0;
-  const totalNet = stats._sum.net_amount?.toNumber() || 0;
+  const totalGross = stats._sum?.gross_amount?.toNumber?.() || stats._sum?.gross_amount || 0;
+  const totalFees = stats._sum?.platform_fee?.toNumber?.() || stats._sum?.platform_fee || 0;
+  const totalNet = stats._sum?.net_amount?.toNumber?.() || stats._sum?.net_amount || 0;
 
   return (
     <div className="space-y-8">
