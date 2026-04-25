@@ -355,7 +355,7 @@ export async function processRefund(paymentId: string) {
   await prisma.payment.update({
     where: { id: paymentId },
     data: {
-      refund_status: "SUCCESS",
+      refund_status: "REFUNDED",
       payment_status: "REFUNDED"
     }
   });
