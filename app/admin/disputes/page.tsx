@@ -5,19 +5,24 @@ import DisputesClientTable from "./DisputesClientTable";
 export const dynamic = "force-dynamic";
 
 export default async function DisputesPage() {
-  const disputedRides = await prisma.ride.findMany({
-    where: {
-      status: "DISPUTED"
-    },
-    include: {
-      student: true,
-      driver: true,
-      payment: true
-    },
-    orderBy: {
-      updated_at: "desc"
-    }
-  });
+  let disputedRides: any[] = [];
+  try {
+    disputedRides = await prisma.ride.findMany({
+      where: {
+        status: "DISPUTED"
+      },
+      include: {
+        student: true,
+        driver: true,
+        payment: true
+      },
+      orderBy: {
+        updated_at: "desc"
+      }
+    });
+  } catch (e) {
+    console.error("Disputes fetch failed (likely build-time):", e);
+  }
 
   return (
     <div className="space-y-6">

@@ -5,14 +5,19 @@ import CampusClientTable from "./CampusClientTable";
 export const dynamic = "force-dynamic";
 
 export default async function CampusesPage() {
-  const campuses = await prisma.campus.findMany({
-    orderBy: { created_at: "desc" },
-    include: {
-      _count: {
-        select: { students: true }
-      }
-    },
-  });
+  let campuses: any[] = [];
+  try {
+    campuses = await prisma.campus.findMany({
+      orderBy: { created_at: "desc" },
+      include: {
+        _count: {
+          select: { students: true }
+        }
+      },
+    });
+  } catch (e) {
+    console.error("Campuses fetch failed (likely build-time):", e);
+  }
 
   return (
     <div className="space-y-6">
