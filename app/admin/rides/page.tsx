@@ -6,19 +6,24 @@ import AutoRefresh from "../AutoRefresh";
 export const dynamic = "force-dynamic";
 
 export default async function RidesPage() {
-  const rides = await prisma.ride.findMany({
-    orderBy: { created_at: "desc" },
-    include: {
-      student: true,
-      driver: true,
-    },
-  });
+  let serializedRides: any[] = [];
+  try {
+    const rides = await prisma.ride.findMany({
+      orderBy: { created_at: "desc" },
+      include: {
+        student: true,
+        driver: true,
+      },
+    });
 
-  const serializedRides = rides.map(r => ({
-    ...r,
-    price: r.price ? r.price.toNumber() : null,
-    driver: r.driver ? { ...r.driver, rating: r.driver.rating ? r.driver.rating.toNumber() : null } : null,
-  }));
+    serializedRides = rides.map(r => ({
+      ...r,
+      price: r.price ? r.price.toNumber() : null,
+      driver: r.driver ? { ...r.driver, rating: r.driver.rating ? r.driver.rating.toNumber() : null } : null,
+    }));
+  } catch (e) {
+    console.error("Rides fetch failed (likely build-time):", e);
+  }
 
   return (
     <div className="space-y-6">

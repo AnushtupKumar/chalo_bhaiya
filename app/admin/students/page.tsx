@@ -5,15 +5,20 @@ import StudentsClientTable from "./StudentsClientTable";
 export const dynamic = "force-dynamic";
 
 export default async function StudentsPage() {
-  const students = await prisma.student.findMany({
-    orderBy: { created_at: "desc" },
-    include: {
-      campus: true,
-      _count: {
-        select: { rides: true }
-      }
-    },
-  });
+  let students: any[] = [];
+  try {
+    students = await prisma.student.findMany({
+      orderBy: { created_at: "desc" },
+      include: {
+        campus: true,
+        _count: {
+          select: { rides: true }
+        }
+      },
+    });
+  } catch (e) {
+    console.error("Students fetch failed (likely build-time):", e);
+  }
 
   return (
     <div className="space-y-6">

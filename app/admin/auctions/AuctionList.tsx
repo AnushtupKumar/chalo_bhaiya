@@ -5,9 +5,15 @@ import Link from "next/link";
 
 export default function AuctionList({ initialAuctions }: { initialAuctions: any[] }) {
   const [auctions, setAuctions] = useState(initialAuctions);
+  const [mounted, setMounted] = useState(false);
 
-  // In a real app, we would use Pusher or Socket.io here.
-  // For now, we'll just show the static list with a manual refresh.
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="animate-pulse bg-[#1a1a1a] h-64 rounded-2xl border border-gray-800" />;
+  }
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">

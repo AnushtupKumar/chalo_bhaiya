@@ -6,17 +6,22 @@ import DriversClientTable from "./DriversClientTable";
 export const dynamic = "force-dynamic";
 
 export default async function DriversPage() {
-  const drivers = await prisma.driver.findMany({
-    orderBy: { created_at: "desc" },
-    include: {
-      kyc: true,
-    },
-  });
+  let serializedDrivers: any[] = [];
+  try {
+    const drivers = await prisma.driver.findMany({
+      orderBy: { created_at: "desc" },
+      include: {
+        kyc: true,
+      },
+    });
 
-  const serializedDrivers = drivers.map(d => ({
-    ...d,
-    rating: d.rating ? d.rating.toNumber() : null,
-  }));
+    serializedDrivers = drivers.map(d => ({
+      ...d,
+      rating: d.rating ? d.rating.toNumber() : null,
+    }));
+  } catch (e) {
+    console.error("Drivers fetch failed (likely build-time):", e);
+  }
 
   return (
     <div className="space-y-6">

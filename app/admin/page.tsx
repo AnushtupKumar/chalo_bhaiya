@@ -6,38 +6,50 @@ import AutoRefresh from "./AutoRefresh";
 export const dynamic = "force-dynamic";
 
 async function MetricsCards() {
-  const [
-    activeRides,
-    kycQueue,
-    totalDrivers,
-    unsettledEarnings,
-  ] = await Promise.all([
-    prisma.ride.count({
-      where: {
-        status: {
-          in: ["ONGOING", "BIDDING", "DRIVER_ASSIGNED"],
-        },
-      },
-    }),
-    prisma.driverKyc.count({
-      where: {
-        kyc_status: {
-          in: ["PENDING", "MANUAL_REVIEW"],
-        },
-      },
-    }),
-    prisma.driver.count(),
-    prisma.driverRideEarning.aggregate({
-      _sum: {
-        net_amount: true,
-      },
-      where: {
-        settlement_status: "UNSETTLED",
-      },
-    }),
-  ]);
+  let activeRides = 0;
+  let kycQueue = 0;
+  let totalDrivers = 0;
+  let totalUnsettled = 0;
 
-  const totalUnsettled = unsettledEarnings._sum.net_amount?.toNumber() || 0;
+  try {
+    const [
+      activeRidesCount,
+      kycQueueCount,
+      totalDriversCount,
+      unsettledEarnings,
+    ] = await Promise.all([
+      prisma.ride.count({
+        where: {
+          status: {
+            in: ["ONGOING", "BIDDING", "DRIVER_ASSIGNED"],
+          },
+        },
+      }),
+      prisma.driverKyc.count({
+        where: {
+          kyc_status: {
+            in: ["PENDING", "MANUAL_REVIEW"],
+          },
+        },
+      }),
+      prisma.driver.count(),
+      prisma.driverRideEarning.aggregate({
+        _sum: {
+          net_amount: true,
+        },
+        where: {
+          settlement_status: "UNSETTLED",
+        },
+      }),
+    ]);
+    
+    activeRides = activeRidesCount;
+    kycQueue = kycQueueCount;
+    totalDrivers = totalDriversCount;
+    totalUnsettled = unsettledEarnings._sum.net_amount?.toNumber() || 0;
+  } catch (e) {
+    console.error("Dashboard metrics fetch failed (likely build-time):", e);
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -93,14 +105,19 @@ async function MetricsCards() {
 }
 
 async function RecentRidesTable() {
-  const rides = await prisma.ride.findMany({
-    take: 5,
-    orderBy: { created_at: "desc" },
-    include: {
-      student: true,
-      driver: true,
-    },
-  });
+  let rides: any[] = [];
+  try {
+    rides = await prisma.ride.findMany({
+      take: 5,
+      orderBy: { created_at: "desc" },
+      include: {
+        student: true,
+        driver: true,
+      },
+    });
+  } catch (e) {
+    console.error("Recent rides fetch failed (likely build-time):", e);
+  }
 
   return (
     <div className="bg-[#1a1a1a] border border-gray-800 rounded-xl overflow-hidden">

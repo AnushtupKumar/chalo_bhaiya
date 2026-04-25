@@ -5,46 +5,51 @@ import PayoutsClientTable from "./PayoutsClientTable";
 export const dynamic = "force-dynamic";
 
 export default async function PayoutsPage() {
-  const earnings = await prisma.driverRideEarning.findMany({
-    where: {
-      settlement_status: "UNSETTLED",
-    },
-    include: {
-      driver: {
-        include: {
-          payout_accounts: {
-            where: { is_primary: true }
-          }
-        }
+  let payoutsArray: any[] = [];
+  try {
+    const earnings = await prisma.driverRideEarning.findMany({
+      where: {
+        settlement_status: "UNSETTLED",
       },
-      ride: true,
-    },
-    orderBy: { created_at: "asc" },
-  });
+      include: {
+        driver: {
+          include: {
+            payout_accounts: {
+              where: { is_primary: true }
+            }
+          }
+        },
+        ride: true,
+      },
+      orderBy: { created_at: "asc" },
+    });
 
-  const driverPayouts = earnings.reduce((acc, earning) => {
-    const dId = earning.driver_id;
-    if (!acc[dId]) {
-      acc[dId] = {
-        driver: earning.driver,
-        totalNet: 0,
-        rideCount: 0,
-        earningIds: []
-      };
-    }
-    acc[dId].totalNet += earning.net_amount.toNumber();
-    acc[dId].rideCount += 1;
-    acc[dId].earningIds.push(earning.id);
-    return acc;
-  }, {} as Record<string, any>);
+    const driverPayouts = earnings.reduce((acc, earning) => {
+      const dId = earning.driver_id;
+      if (!acc[dId]) {
+        acc[dId] = {
+          driver: earning.driver,
+          totalNet: 0,
+          rideCount: 0,
+          earningIds: []
+        };
+      }
+      acc[dId].totalNet += earning.net_amount.toNumber();
+      acc[dId].rideCount += 1;
+      acc[dId].earningIds.push(earning.id);
+      return acc;
+    }, {} as Record<string, any>);
 
-  const payoutsArray = Object.values(driverPayouts).map((payout: any) => ({
-    ...payout,
-    driver: {
-      ...payout.driver,
-      rating: payout.driver.rating ? payout.driver.rating.toNumber() : null
-    }
-  }));
+    payoutsArray = Object.values(driverPayouts).map((payout: any) => ({
+      ...payout,
+      driver: {
+        ...payout.driver,
+        rating: payout.driver.rating ? payout.driver.rating.toNumber() : null
+      }
+    }));
+  } catch (e) {
+    console.error("Payouts fetch failed (likely build-time):", e);
+  }
 
   return (
     <div className="space-y-6">
