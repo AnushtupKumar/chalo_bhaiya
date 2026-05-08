@@ -6,6 +6,8 @@ import { updateSetting } from "../actions";
 export default function SettingsClientForm({ initialSettings }: { initialSettings: any }) {
   const [advanceFee, setAdvanceFee] = useState(initialSettings.ADVANCE_FEE_PERCENTAGE || "20");
   const [platformFee, setPlatformFee] = useState(initialSettings.PLATFORM_FEE_PERCENTAGE || "10");
+  const [baseRate, setBaseRate] = useState(initialSettings.BASE_RATE || "40");
+  const [ratePerKm, setRatePerKm] = useState(initialSettings.RATE_PER_KM || "10");
   const [isPending, setIsPending] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -16,6 +18,8 @@ export default function SettingsClientForm({ initialSettings }: { initialSetting
     try {
       await updateSetting("ADVANCE_FEE_PERCENTAGE", advanceFee);
       await updateSetting("PLATFORM_FEE_PERCENTAGE", platformFee);
+      await updateSetting("BASE_RATE", baseRate);
+      await updateSetting("RATE_PER_KM", ratePerKm);
       setMessage("✅ Settings updated successfully.");
       setTimeout(() => setMessage(""), 3000);
     } catch (e) {
@@ -59,6 +63,31 @@ export default function SettingsClientForm({ initialSettings }: { initialSetting
             />
             <span className="text-2xl font-bold text-gray-600">%</span>
           </div>
+        </div>
+
+        <div className="pt-6 border-t border-gray-800">
+          <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-4 text-gray-500">Smart Pricing Engine (Fallback)</h4>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-gray-400">Base Fare (₹)</label>
+              <input 
+                type="number" 
+                className="w-full bg-[#222] border border-gray-700 rounded-xl px-4 py-2 text-white font-bold outline-none focus:border-green-500 transition-colors"
+                value={baseRate}
+                onChange={e => setBaseRate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-gray-400">Rate per KM (₹)</label>
+              <input 
+                type="number" 
+                className="w-full bg-[#222] border border-gray-700 rounded-xl px-4 py-2 text-white font-bold outline-none focus:border-green-500 transition-colors"
+                value={ratePerKm}
+                onChange={e => setRatePerKm(e.target.value)}
+              />
+            </div>
+          </div>
+          <p className="text-[10px] text-gray-600 mt-2">These rates apply when a route doesn't have a fixed price or enough history.</p>
         </div>
       </div>
 

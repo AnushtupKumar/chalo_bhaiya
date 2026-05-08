@@ -107,7 +107,10 @@ export default function DriversClientTable({ initialDrivers }: { initialDrivers:
                       {kycStatus}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-white">⭐ {driver.rating?.toString() || "N/A"}</td>
+                  <td className="px-6 py-4 text-white">
+                    ⭐ {driver.rating?.toString() || "N/A"}
+                    <span className="text-[10px] text-gray-500 ml-1">({driver.total_ratings || 0})</span>
+                  </td>
                   <td className="px-6 py-4">
                     {driver.onboarding_status === 'UNDER_REVIEW' || driver.onboarding_status === 'SUBMITTED' ? (
                       <div className="flex flex-col space-y-2">

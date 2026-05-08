@@ -61,6 +61,28 @@ export default async function DriverDetailsPage({ params }: { params: { id: stri
         {/* Left Column: Details */}
         <div className="lg:col-span-1">
           <EditDriverForm driver={serializedDriver} />
+          
+          <div className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-6 mt-6">
+            <h3 className="text-lg font-semibold text-white mb-4 border-b border-gray-800 pb-2 flex items-center justify-between">
+              Rating & Performance
+              <span className="text-xs text-gray-500 font-normal">{driver.total_ratings || 0} reviews</span>
+            </h3>
+            <div className="flex items-end gap-2 mb-4">
+              <span className="text-4xl font-bold text-white leading-none">{serializedDriver.rating || "5.0"}</span>
+              <span className="text-yellow-500 text-xl mb-1">★★★★★</span>
+            </div>
+            <div className="space-y-3 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-500">Rides Today</span>
+                <span className="text-white font-medium">{driver.rides_today}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-500">Driver Cancellations</span>
+                <span className="text-red-400 font-medium">{driver.driver_cancel_count}</span>
+              </div>
+            </div>
+          </div>
+
           <EditKycForm driverId={driver.id} kyc={driver.kyc} />
           <PayoutAccountsCard driverId={driver.id} accounts={driver.payout_accounts || []} />
         </div>

@@ -115,6 +115,7 @@ model Driver {
   status                  driver_status_enum     @default(INACTIVE)
   
   rides_today             Int                    @default(0)
+  total_ratings           Int                    @default(0)
   driver_cancel_count     Int                    @default(0)
   
   address_line1           String?
@@ -391,4 +392,28 @@ model SystemSetting {
   updated_at DateTime @updatedAt
 
   @@map("system_settings")
+}
+
+
+
+model RouteMap {
+  id               String   @id @default(uuid())
+  pickup           String
+  destination      String
+  base_price       Decimal  @db.Decimal(10, 2)
+  estimated_km     Decimal  @db.Decimal(10, 2)
+  actual_avg_price Decimal? @db.Decimal(10, 2)
+  ride_count       Int      @default(0)
+  is_active        Boolean  @default(true)
+
+  // UI Enhancements
+  is_popular       Boolean  @default(false)
+  sort_order       Int      @default(0)
+  tag              String?
+
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now()) @updatedAt
+
+  @@unique([pickup, destination])
+  @@map("route_maps")
 }

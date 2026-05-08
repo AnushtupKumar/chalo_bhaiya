@@ -25,6 +25,30 @@ export async function logAction(data: {
   });
 }
 
+async function notifyKycStatus(driverId: string, status: 'verified' | 'rejected', reason?: string) {
+  const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
+  const adminSecret = process.env.ADMIN_PASSWORD || "chaloadmin2024";
+
+  try {
+    const res = await fetch(`${backendUrl}/admin/driver/${driverId}/kyc-notification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-secret': adminSecret
+      },
+      body: JSON.stringify({ status, reason })
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      console.error(`Failed to send KYC notification: ${res.status} ${res.statusText}`, data);
+    } else {
+      console.log(`KYC ${status} notification sent for driver ${driverId}`);
+    }
+  } catch (err) {
+    console.error(`Error calling backend for KYC notification:`, err);
+  }
+}
+
 export async function approveKyc(driverId: string) {
   await prisma.$transaction([
     prisma.driverKyc.upsert({
@@ -48,6 +72,9 @@ export async function approveKyc(driverId: string) {
 
   revalidatePath("/admin/drivers");
   revalidatePath("/admin");
+
+  // Notify driver
+  await notifyKycStatus(driverId, "verified");
 }
 
 export async function rejectKyc(driverId: string, reason: string) {
@@ -73,6 +100,9 @@ export async function rejectKyc(driverId: string, reason: string) {
 
   revalidatePath("/admin/drivers");
   revalidatePath("/admin");
+
+  // Notify driver
+  await notifyKycStatus(driverId, "rejected", reason);
 }
 
 export async function processPayout(driverId: string, earningIds: string[], amount: number, accountId: string) {
