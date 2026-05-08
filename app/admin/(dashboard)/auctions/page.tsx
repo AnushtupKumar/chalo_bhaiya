@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import AuctionList from "./AuctionList";
+import AutoRefresh from "../AutoRefresh";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,7 @@ export default async function AuctionsPage() {
 
   return (
     <div className="space-y-6">
+      <AutoRefresh intervalMs={3000} />
       <div className="flex flex-col space-y-2">
         <h1 className="text-3xl font-bold text-white tracking-tight">Live Auction Monitor</h1>
         <p className="text-gray-400">Watch real-time bidding activity on WhatsApp.</p>

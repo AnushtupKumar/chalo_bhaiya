@@ -7,10 +7,25 @@ const SECRET = new TextEncoder().encode(process.env.ADMIN_PASSWORD || "chalo-sec
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  // Only protect /admin routes, but ignore /admin/login
-  if (path.startsWith("/admin") && path !== "/admin/login") {
+  // Only protect /admin routes
+  if (path.startsWith("/admin")) {
     const session = request.cookies.get("admin_session")?.value;
 
+    // If trying to access login page while already authenticated, redirect to dashboard
+    if (path === "/admin/login") {
+      if (session) {
+        try {
+          await jwtVerify(session, SECRET);
+          return NextResponse.redirect(new URL("/admin", request.url));
+        } catch (error) {
+          // Token invalid, allow access to login page
+          return NextResponse.next();
+        }
+      }
+      return NextResponse.next();
+    }
+
+    // Protect other /admin routes
     if (!session) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }

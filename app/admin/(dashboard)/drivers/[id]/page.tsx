@@ -6,6 +6,7 @@ import EditDriverForm from "./EditDriverForm";
 import EditKycForm from "./EditKycForm";
 import AddDocumentForm from "./AddDocumentForm";
 import PayoutAccountsCard from "./PayoutAccountsCard";
+import DeleteDocumentButton from "./DeleteDocumentButton";
 
 export const dynamic = "force-dynamic";
 
@@ -98,7 +99,10 @@ export default async function DriverDetailsPage({ params }: { params: { id: stri
                   <div key={doc.id} className="border border-gray-800 rounded-lg overflow-hidden bg-[#222]">
                     <div className="p-3 border-b border-gray-800 flex justify-between items-center bg-[#1a1a1a]">
                       <span className="font-semibold text-sm text-gray-300">{doc.doc_type.replace(/_/g, " ")}</span>
-                      <span className="text-[10px] text-gray-500">{new Date(doc.uploaded_at).toLocaleDateString()}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-gray-500">{new Date(doc.uploaded_at).toLocaleDateString()}</span>
+                        <DeleteDocumentButton docId={doc.id} />
+                      </div>
                     </div>
                     <div className="aspect-[4/3] relative bg-black flex items-center justify-center p-2">
                       <img 

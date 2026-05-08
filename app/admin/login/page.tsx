@@ -1,34 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { login } from "@/lib/auth"; // Note: this will need a server action wrapper or be handled differently
+import { handleLoginAction } from "./actions";
 
 // Let's create a server action for login to avoid client-side crypto issues
-// but for now, I'll use a simple form that calls a server action.
 export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    // We'll call the login function via a server action
     try {
-      const { handleLoginAction } = await import("./actions");
       const success = await handleLoginAction(password);
       
-      if (success) {
-        router.push("/admin");
-        router.refresh();
-      } else {
+      if (!success) {
         setError("Invalid administrator password.");
       }
+      // Note: redirect is handled in the server action if successful
     } catch (err) {
+      // If redirect happens, this catch might be triggered with a special error
+      // But Next.js handles it. If it's a real error, we show it.
+      if (err instanceof Error && err.message === "NEXT_REDIRECT") {
+        return;
+      }
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);

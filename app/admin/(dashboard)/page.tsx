@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Suspense } from "react";
-import AutoRefresh from "./AutoRefresh";
+
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +42,7 @@ async function MetricsCards() {
         },
       }),
     ]);
-    
+
     activeRides = activeRidesCount;
     kycQueue = kycQueueCount;
     totalDrivers = totalDriversCount;
@@ -175,10 +175,10 @@ async function RecentRidesTable() {
 export default function AdminDashboard() {
   return (
     <div className="space-y-6">
-      <AutoRefresh intervalMs={5000} />
+
       <div className="flex flex-col space-y-2">
         <h1 className="text-3xl font-bold text-white tracking-tight">Overview</h1>
-        <p className="text-gray-400">Monitor your platform's pulse in real-time.</p>
+        <p className="text-gray-400">Monitor your platform's pulse</p>
       </div>
 
       <Suspense fallback={<div className="h-32 bg-[#1a1a1a] rounded-xl animate-pulse"></div>}>

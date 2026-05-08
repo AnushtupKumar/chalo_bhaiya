@@ -193,6 +193,7 @@ model DriverDocument {
   payout_accounts DriverPayoutAccount[]
 
   @@index([driver_id], name: "idx_driver_documents_driver_id")
+  @@unique([driver_id, doc_type])
   @@map("driver_documents")
 }
 

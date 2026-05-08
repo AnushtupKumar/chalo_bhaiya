@@ -203,15 +203,38 @@ export async function uploadDocument(driverId: string, docType: any, formData: F
 
   const publicUrl = `/uploads/${filename}`;
 
-  await prisma.driverDocument.create({
-    data: {
-      driver_id: driverId,
-      doc_type: docType,
-      storage_url: publicUrl,
-      uploaded_at: new Date()
+  try {
+    await prisma.driverDocument.create({
+      data: {
+        driver_id: driverId,
+        doc_type: docType,
+        storage_url: publicUrl,
+        uploaded_at: new Date()
+      }
+    });
+  } catch (error: any) {
+    if (error.code === 'P2002') {
+      throw new Error(`A document of type ${docType.replace(/_/g, " ")} already exists for this driver. Please delete the old one first.`);
     }
-  });
+    throw error;
+  }
   revalidatePath(`/admin/drivers/${driverId}`);
+}
+
+export async function deleteDocument(docId: string) {
+  const doc = await prisma.driverDocument.delete({
+    where: { id: docId }
+  });
+  
+  await logAction({
+    actor_type: "ADMIN",
+    action: "DELETE_DOCUMENT",
+    entity_type: "DOCUMENT",
+    entity_id: docId,
+    metadata: { driver_id: doc.driver_id, doc_type: doc.doc_type }
+  });
+
+  revalidatePath(`/admin/drivers/${doc.driver_id}`);
 }
 
 export async function addPayoutAccount(driverId: string, data: any) {
