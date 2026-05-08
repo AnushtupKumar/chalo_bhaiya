@@ -17,11 +17,43 @@ export default function PayoutsClientTable({ payoutsArray }: { payoutsArray: any
     setIsPending(false);
   }
 
+  async function handleProcessAll() {
+    const validPayouts = payoutsArray.filter(p => p.driver.payout_accounts[0]?.is_verified);
+    
+    if (validPayouts.length === 0) {
+      alert("No drivers with verified payout accounts found.");
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to process payouts for ${validPayouts.length} drivers?\n\nTotal amount: ₹${validPayouts.reduce((sum, p) => sum + p.totalNet, 0).toLocaleString()}`)) {
+      return;
+    }
+
+    setIsPending(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const payout of validPayouts) {
+      const primaryAcc = payout.driver.payout_accounts[0];
+      try {
+        await processPayout(payout.driver.id, payout.earningIds, payout.totalNet, primaryAcc.id);
+        successCount++;
+      } catch (e) {
+        console.error(`Failed to process payout for ${payout.driver.phone}:`, e);
+        failCount++;
+      }
+    }
+
+    alert(`Batch processing complete!\n\n✅ Successfully initiated: ${successCount}\n❌ Failed: ${failCount}`);
+    setIsPending(false);
+  }
+
   return (
     <div className="bg-[#1a1a1a] border border-gray-800 rounded-xl overflow-hidden">
       <div className="p-6 border-b border-gray-800 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-white">Pending Settlements</h3>
         <button 
+          onClick={handleProcessAll}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm rounded-lg transition-colors disabled:opacity-50"
           disabled={isPending || payoutsArray.length === 0}
         >

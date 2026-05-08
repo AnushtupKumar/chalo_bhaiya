@@ -7,6 +7,7 @@ import EditKycForm from "./EditKycForm";
 import AddDocumentForm from "./AddDocumentForm";
 import PayoutAccountsCard from "./PayoutAccountsCard";
 import DeleteDocumentButton from "./DeleteDocumentButton";
+import DeleteDriverButton from "./DeleteDriverButton";
 
 export const dynamic = "force-dynamic";
 
@@ -120,6 +121,11 @@ export default async function DriverDetailsPage({ params }: { params: { id: stri
           </div>
         </div>
       </div>
+
+      <DeleteDriverButton 
+        driverId={driver.id} 
+        driverName={driver.name || driver.phone} 
+      />
     </div>
   );
 }

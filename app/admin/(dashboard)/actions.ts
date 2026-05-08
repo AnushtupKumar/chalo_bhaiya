@@ -27,9 +27,10 @@ export async function logAction(data: {
 
 export async function approveKyc(driverId: string) {
   await prisma.$transaction([
-    prisma.driverKyc.update({
+    prisma.driverKyc.upsert({
       where: { driver_id: driverId },
-      data: { kyc_status: "VERIFIED", verified_at: new Date() }
+      update: { kyc_status: "VERIFIED", verified_at: new Date() },
+      create: { driver_id: driverId, kyc_status: "VERIFIED", verified_at: new Date() }
     }),
     prisma.driver.update({
       where: { id: driverId },
@@ -51,9 +52,10 @@ export async function approveKyc(driverId: string) {
 
 export async function rejectKyc(driverId: string, reason: string) {
   await prisma.$transaction([
-    prisma.driverKyc.update({
+    prisma.driverKyc.upsert({
       where: { driver_id: driverId },
-      data: { kyc_status: "REJECTED" }
+      update: { kyc_status: "REJECTED" },
+      create: { driver_id: driverId, kyc_status: "REJECTED" }
     }),
     prisma.driver.update({
       where: { id: driverId },
@@ -149,16 +151,54 @@ export async function createDriver(data: any) {
   }
 }
 
+async function ensureUnderReviewIfRejected(driverId: string) {
+  const driver = await prisma.driver.findUnique({
+    where: { id: driverId },
+    select: { onboarding_status: true }
+  });
+
+  if (driver?.onboarding_status === "REJECTED") {
+    await prisma.driver.update({
+      where: { id: driverId },
+      data: {
+        onboarding_status: "UNDER_REVIEW",
+        rejection_reason: null,
+        rejected_at: null
+      }
+    });
+  }
+}
+
 export async function updateDriver(driverId: string, data: any) {
+  await ensureUnderReviewIfRejected(driverId);
   await prisma.driver.update({
     where: { id: driverId },
     data
   });
+  
   revalidatePath(`/admin/drivers/${driverId}`);
   revalidatePath("/admin/drivers");
 }
 
+export async function deleteDriver(driverId: string) {
+  const driver = await prisma.driver.delete({
+    where: { id: driverId }
+  });
+
+  await logAction({
+    actor_type: "ADMIN",
+    action: "DELETE_DRIVER",
+    entity_type: "DRIVER",
+    entity_id: driverId,
+    metadata: { phone: driver.phone, name: driver.name }
+  });
+
+  revalidatePath("/admin/drivers");
+  revalidatePath("/admin");
+}
+
 export async function updateKycData(driverId: string, data: any) {
+  await ensureUnderReviewIfRejected(driverId);
   await prisma.driverKyc.upsert({
     where: { driver_id: driverId },
     update: data,
@@ -172,6 +212,7 @@ export async function updateKycData(driverId: string, data: any) {
 }
 
 export async function addDocument(driverId: string, docType: any, url: string) {
+  await ensureUnderReviewIfRejected(driverId);
   await prisma.driverDocument.create({
     data: {
       driver_id: driverId,
@@ -204,6 +245,7 @@ export async function uploadDocument(driverId: string, docType: any, formData: F
   const publicUrl = `/uploads/${filename}`;
 
   try {
+    await ensureUnderReviewIfRejected(driverId);
     await prisma.driverDocument.create({
       data: {
         driver_id: driverId,
@@ -397,4 +439,25 @@ export async function processRefund(paymentId: string) {
 
   revalidatePath(`/admin/rides/${payment.ride_id}`);
   revalidatePath("/admin/revenue");
+}
+
+export async function deleteStudent(studentId: string) {
+  const student = await prisma.student.delete({
+    where: { id: studentId }
+  });
+
+  await logAction({
+    actor_type: "ADMIN",
+    action: "DELETE_STUDENT",
+    entity_type: "STUDENT",
+    entity_id: studentId,
+    metadata: { phone: student.phone }
+  });
+
+  revalidatePath("/admin/students");
+  revalidatePath("/admin");
+}
+
+export async function verifyAdminPassword(password: string) {
+  return password === (process.env.ADMIN_PASSWORD || "chaloadmin2024");
 }

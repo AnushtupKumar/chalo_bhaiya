@@ -56,10 +56,10 @@ export default function OnboardingForm() {
             <input name="phone" type="tel" required className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-chalo-green focus:border-chalo-green outline-none transition-all" placeholder="+91..." />
           </div>
         </div>
-        <div>
+        {/**<div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Profile Photo</label>
           <input name="profile_file" type="file" accept="image/*" required className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer" />
-        </div>
+        </div>**/}
       </div>
 
       {/* Section 2: Vehicle Info */}
@@ -70,17 +70,17 @@ export default function OnboardingForm() {
             <label className="block text-sm font-semibold text-gray-700 mb-1">Vehicle Registration Number (RC)</label>
             <input name="vehicle_number" type="text" required className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-chalo-green focus:border-chalo-green outline-none transition-all uppercase" placeholder="MH 01 AB 1234" />
           </div>
-          <div>
+          {/* <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Upload Vehicle RC</label>
             <input name="rc_file" type="file" accept="image/*,application/pdf" required className="w-full border border-gray-300 bg-white rounded-lg px-3 py-2 text-sm text-gray-600 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 cursor-pointer" />
-          </div>
+          </div> */}
         </div>
       </div>
 
       {/* Section 3: KYC Documents */}
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-gray-900 border-b pb-2">3. Identity Verification</h3>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Full Aadhaar Number</label>
@@ -108,7 +108,7 @@ export default function OnboardingForm() {
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-gray-900 border-b pb-2">4. Payout Details (Optional)</h3>
         <p className="text-xs text-gray-500 mb-2">Upload these now to get verified for payouts faster.</p>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Upload UPI QR Code</label>
@@ -122,8 +122,8 @@ export default function OnboardingForm() {
       </div>
 
       {/* Submit Button */}
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         disabled={isSubmitting}
         className="w-full py-4 bg-[#25D366] hover:bg-[#1DA851] text-white text-lg font-bold rounded-xl transition-colors shadow-lg shadow-green-500/30 disabled:opacity-70 flex items-center justify-center gap-2"
       >

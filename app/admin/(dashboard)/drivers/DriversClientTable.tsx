@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { approveKyc, rejectKyc } from "../actions";
+import { approveKyc, rejectKyc, deleteDriver } from "../actions";
 
 export default function DriversClientTable({ initialDrivers }: { initialDrivers: any[] }) {
   const [search, setSearch] = useState("");
@@ -31,6 +31,17 @@ export default function DriversClientTable({ initialDrivers }: { initialDrivers:
       await rejectKyc(id, reason);
     } catch (e) {
       alert("Error rejecting KYC.");
+    }
+    setIsPending(false);
+  }
+
+  async function handleDelete(id: string, name: string) {
+    if (!confirm(`⚠️ WARNING: Are you sure you want to delete driver ${name || id}?\n\nThis will permanently delete all associated rides, earnings, and documents. This action cannot be undone.`)) return;
+    setIsPending(true);
+    try {
+      await deleteDriver(id);
+    } catch (e) {
+      alert("Error deleting driver.");
     }
     setIsPending(false);
   }
